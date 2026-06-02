@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>رابط تحميل فوري | محول الملفات إلى رابط مباشر</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Tahoma', 'Cairo', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f6f9fc 0%, #eef2f5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+
+        /* بطاقة التطبيق الرئيسية */
+        .converter-card {
+            max-width: 850px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(2px);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        /* رأس الصفحة */
+        .header {
+            background: #1e2f3e;
+            padding: 1.8rem 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header h1 span {
+            background: #ffb347;
+            padding: 0.2rem 0.8rem;
+            border-radius: 100px;
+            font-size: 1.1rem;
+            color: #1e2f3e;
+        }
+
+        .sub {
+            margin-top: 12px;
+            opacity: 0.85;
+            font-size: 0.95rem;
+        }
+
+        /* محتوى رئيسي */
+        .main-content {
+            padding: 2rem 2rem 2rem 2rem;
+        }
+
+        /* منطقة السحب والإفلات */
+        .drop-zone {
+            background: #f8fafd;
+            border: 2.5px dashed #b9cadb;
+            border-radius: 2rem;
+            padding: 2rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease-in-out;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .drop-zone:hover {
+            border-color: #ff9142;
+            background: #fff5ed;
+            transform: scale(0.99);
+        }
+
+        .drop-zone.drag-over {
+            background: #ffe6d5;
+            border-color: #ff6a1a;
+            border-width: 3px;
+        }
+
+        .upload-icon {
+            font-size: 3.8rem;
+            margin-bottom: 0.8rem;
+            display: inline-block;
+        }
+
+        .drop-zone p {
+            color: #2c3e44;
+            font-weight: 500;
+            margin: 0.5rem 0;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            background: #ff9142;
+            color: white;
+            padding: 0.7rem 1.7rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            border: none;
+            box-shadow: 0 6px 12px -8px rgba(0,0,0,0.2);
+        }
+
+        .file-input-label:hover {
+            background: #e07c2e;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* معلومات الملف المرفوع */
+        .file-info {
+            background: #ecf3f8;
+            border-radius: 1.6rem;
+            padding: 1rem 1.4rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            font-size: 0.9rem;
+        }
+
+        .file-details {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            word-break: break-all;
+        }
+
+        .file-name {
+            background: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-family: monospace;
+            font-weight: 600;
+            color: #1f3b44;
+        }
+
+        .file-size {
+            color: #3c6e71;
+            font-weight: 500;
+        }
+
+        .reset-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: 0.2s;
+            padding: 0 6px;
+        }
+
+        .reset-btn:hover {
+            color: #c0392b;
+            transform: scale(1.1);
+        }
+
+        /* نتيجة الرابط */
+        .result-section {
+            background: #ffffffea;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e2edf2;
+            margin: 1rem 0 1.5rem 0;
+            transition: all 0.2s;
+        }
+
+        .result-label {
+            font-weight: 700;
+            color: #1e4663;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        .link-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            background: #f1f5f9;
+            border-radius: 90px;
+            padding: 0.4rem 0.4rem 0.4rem 1.2rem;
+            border: 1px solid #cbdde9;
+        }
+
+        .generated-link {
+            flex: 1;
+            font-family: monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            color: #1f6392;
+            background: transparent;
+            border: none;
+            padding: 10px 5px;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .copy-btn, .download-btn {
+            background: #2c7da0;
+            border: none;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .copy-btn:hover {
+            background: #1f5e7a;
+        }
+
+        .download-btn {
+            background: #27ae60;
+        }
+
+        .download-btn:hover {
+            background: #1e8f50;
+        }
+
+        /* رسائل toast */
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e2f3ee6;
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            z-index: 1000;
+            transition: opacity 0.3s;
+            opacity: 0;
+            pointer-events: none;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #68869e;
+            margin-top: 1.2rem;
+            border-top: 1px solid #e0ecf3;
+            padding-top: 1.2rem;
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        @media (max-width: 550px) {
+            .main-content {
+                padding: 1.2rem;
+            }
+            .link-container {
+                border-radius: 1rem;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .copy-btn, .download-btn {
+                justify-content: center;
+            }
+            .toast-msg {
+                white-space: normal;
+                text-align: center;
+                width: 80%;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="converter-card">
+    <div class="header">
+        <h1>
+            📎 رفع الملفات ↦ رابط تحميل 
+            <span>مباشر</span>
+        </h1>
+        <div class="sub">ارفع أي ملف — نص، صورة، فيديو، مستند — نحوله إلى رابط قابل للتحميل فوراً</div>
+    </div>
+
+    <div class="main-content">
+        <!-- منطقة السحب والإفلات -->
+        <div class="drop-zone" id="dropZone">
+            <div class="upload-icon">📂⬆️</div>
+            <p><strong>اسحب وأفلت ملفك هنا</strong> أو انقر للاختيار</p>
+            <label class="file-input-label" for="fileInput">📁 اختر ملف من جهازك</label>
+            <input type="file" id="fileInput">
+        </div>
+
+        <!-- عرض معلومات الملف الحالي -->
+        <div class="file-info" id="fileInfoBox" style="display: none;">
+            <div class="file-details">
+                <span>📄 الملف:</span>
+                <span class="file-name" id="fileNameDisplay">-</span>
+                <span class="file-size" id="fileSizeDisplay">-</span>
+            </div>
+            <button class="reset-btn" id="resetFileBtn" title="إزالة الملف">✖️</button>
+        </div>
+
+        <!-- منطقة النتيجة: الرابط -->
+        <div class="result-section" id="resultSection" style="display: none;">
+            <div class="result-label">
+                🔗 رابط التحميل المباشر (رابط داخلي):
+            </div>
+            <div class="link-container">
+                <input type="text" class="generated-link" id="generatedLinkInput" readonly>
+                <button class="copy-btn" id="copyLinkBtn">📋 نسخ الرابط</button>
+                <button class="download-btn" id="directDownloadBtn">⬇️ تحميل الملف</button>
+            </div>
+            <div style="margin-top: 12px; font-size: 0.75rem; color:#4f6f8a;">
+                💡 الرابط يعمل داخل هذه الصفحة — يمكنك نسخه واستخدامه للتنزيل أو المشاركة (رابط كائن blob مؤقت).
+            </div>
+        </div>
+
+        <div class="footer-note">
+            🧩 يتم إنشاء رابط تحميل فوري داخل المتصفح — آمن وسريع. الملفات لا تُرفع إلى أي خادم خارجي.
+        </div>
+    </div>
+</div>
+
+<div id="toastMsg" class="toast-msg">✨ تم نسخ الرابط</div>
+
+<script>
+    (function(){
+        // عناصر DOM
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfoBox = document.getElementById('fileInfoBox');
+        const fileNameSpan = document.getElementById('fileNameDisplay');
+        const fileSizeSpan = document.getElementById('fileSizeDisplay');
+        const resetBtn = document.getElementById('resetFileBtn');
+        const resultSection = document.getElementById('resultSection');
+        const generatedLinkInput = document.getElementById('generatedLinkInput');
+        const copyLinkBtn = document.getElementById('copyLinkBtn');
+        const directDownloadBtn = document.getElementById('directDownloadBtn');
+
+        // متغيرات تخزين الحالة
+        let currentFile = null;          // كائن الملف الحالي
+        let currentBlobUrl = null;       // الرابط الداخلي (blob:...)
+        
+        // دالة لعرض رسالة منبثقة
+        function showToast(message, duration = 2500) {
+            const toast = document.getElementById('toastMsg');
+            toast.textContent = message;
+            toast.style.opacity = '1';
+            toast.style.pointerEvents = 'none';
+            clearTimeout(window.toastTimeout);
+            window.toastTimeout = setTimeout(() => {
+                toast.style.opacity = '0';
+            }, duration);
+        }
+
+        // تحرير الموارد عند تغيير الملف أو إلغاؤه
+        function revokeExistingUrl() {
+            if (currentBlobUrl) {
+                URL.revokeObjectURL(currentBlobUrl);
+                currentBlobUrl = null;
+            }
+        }
+
+        // تحديث واجهة المستخدم بناءً على الملف الحالي
+        function updateUIForFile(file) {
+            if (!file) {
+                // لا يوجد ملف: اخفاء معلومات الملف والنتيجة
+                fileInfoBox.style.display = 'none';
+                resultSection.style.display = 'none';
+                if (currentBlobUrl) revokeExistingUrl();
+                currentFile = null;
+                return;
+            }
+            
+            // عرض معلومات الملف
+            fileInfoBox.style.display = 'flex';
+            fileNameSpan.textContent = file.name;
+            const sizeInKB = (file.size / 1024).toFixed(2);
+            const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+            let sizeText = '';
+            if (file.size < 1024 * 1024) {
+                sizeText = `${sizeInKB} كيلوبايت`;
+            } else {
+                sizeText = `${sizeInMB} ميجابايت`;
+            }
+            fileSizeSpan.textContent = sizeText;
+            
+            // توليد رابط جديد (blob)
+            revokeExistingUrl();   // إزالة الرابط القديم إن وجد
+            
+            const newBlobUrl = URL.createObjectURL(file);
+            currentBlobUrl = newBlobUrl;
+            currentFile = file;
+            
+            // عرض الرابط في حقل الإدخال
+            generatedLinkInput.value = newBlobUrl;
+            resultSection.style.display = 'block';
+        }
+        
+        // المعالجة الأساسية عند اختيار ملف
+        function handleFileSelected(file) {
+            if (!file) return;
+            // تحقق من حجم الملف (حدود معقولة، لكن يمكن للمتصفح تحمل مئات الميجا، لكن تجنب الضغط)
+            if (file.size > 800 * 1024 * 1024) {
+                showToast("⚠️ الملف كبير جدًا (أكثر من 800 ميجابايت) قد يؤثر على الأداء.", 4000);
+                // لكننا لن نمنع المستخدم، فقط إنذار
+            }
+            updateUIForFile(file);
+            showToast(`✅ تم تحميل الملف: ${file.name} - جاهز للربط`, 2000);
+        }
+        
+        // عند اختيار ملف عبر input
+        fileInput.addEventListener('change', (e) => {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                handleFileSelected(files[0]);
+            }
+            // إعادة تعيين قيمة input حتى يتمكن المستخدم من رفع نفس الملف مجدداً
+            fileInput.value = '';
+        });
+        
+        // أحداث السحب والإفلات
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+        
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const droppedFiles = e.dataTransfer.files;
+            if (droppedFiles && droppedFiles.length > 0) {
+                handleFileSelected(droppedFiles[0]);
+            }
+        });
+        
+        // النقر على منطقة السحب يعمل كاختيار ملف (باستثناء زر الاختيار نفسه، لكننا سنضيفه منفرداً)
+        dropZone.addEventListener('click', (e) => {
+            // منع التداخل إذا كان المستخدم قد نقر على الـ label أو input
+            if (e.target === fileInput || e.target.closest('.file-input-label')) return;
+            fileInput.click();
+        });
+        
+        // زر إعادة تعيين / إزالة الملف
+        resetBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            revokeExistingUrl();
+            currentFile = null;
+            currentBlobUrl = null;
+            fileInfoBox.style.display = 'none';
+            resultSection.style.display = 'none';
+            fileInput.value = '';
+            showToast("🗑️ تم مسح الملف والرابط", 1500);
+        });
+        
+        // نسخ الرابط إلى الحافظة
+        copyLinkBtn.addEventListener('click', async () => {
+            if (!currentBlobUrl) {
+                showToast("⚠️ لا يوجد رابط لنسخه، يرجى رفع ملف أولاً", 2000);
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(currentBlobUrl);
+                showToast("📋 تم نسخ رابط التحميل إلى الحافظة!", 1800);
+            } catch (err) {
+                // طريقة احتياطية قديمة
+                const textarea = document.createElement('textarea');
+                textarea.value = currentBlobUrl;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast("📋 تم نسخ الرابط (طريقة يدوية)", 1800);
+            }
+        });
+        
+        // زر التحميل المباشر: يقوم بإنشاء رابط تحميل مؤقت وفتحه أو بدء التحميل باسم الملف الأصلي
+        directDownloadBtn.addEventListener('click', () => {
+            if (!currentFile || !currentBlobUrl) {
+                showToast("❌ لا يوجد ملف محدد، حمّل ملفاً أولاً", 2000);
+                return;
+            }
+            // طريقة تحميل الملف باستخدام عنصر <a> مع خاصية download للحفاظ على الاسم الأصلي
+            const link = document.createElement('a');
+            link.href = currentBlobUrl;
+            link.download = currentFile.name;   // تعيين اسم الملف الأصلي
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast(`⬇️ بدء تحميل "${currentFile.name}" ...`, 2000);
+        });
+        
+        // إضافة بعض التحسينات: تنظيف الرابط عند إغلاق الصفحة (ليس ضروريًا لكنه احترامي)
+        window.addEventListener('beforeunload', () => {
+            if (currentBlobUrl) {
+                URL.revokeObjectURL(currentBlobUrl);
+            }
+        });
+        
+        // دعم إضافي: عند تحميل ملف جديد وتحديده مرة أخرى، يتم إلغاء الرابط القديم تلقائياً عبر revokeExistingUrl في updateUIForFile
+        // وصف أولي: يمكن للمستخدم رفع أي ملف والنقر على رابط التحميل أو نسخ الرابط. الرابط من نوع blob صالح طالما الصفحة مفتوحة.
+        // كل رابط فريد ومباشر لتنزيل محتوى الملف.
+        console.log("جاهز - محول الملفات إلى رابط تحميل");
+        
+        // إضافة تلميح: إذا أردنا رفع الملف عبر أيقونة السحب والإفلات بدون أي مشكلة
+        // منع السلوك الافتراضي للنوافذ
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+        function preventDefaults (e) {
+            if (e.target.closest && !e.target.closest('.drop-zone') && e.type !== 'dragleave') {
+                // نمنع فقط السحب خارج المنطقة ولكن لا نعيق بقية السلوك
+                if(e.type !== 'dragover') return;
+                e.preventDefault();
+                return;
+            }
+            if(e.type !== 'dragover') e.preventDefault();
+        }
+        // تحسين إضافي لإزالة تأثير drag-over عند مغادرة الوثيقة
+        window.addEventListener('dragend', () => {
+            dropZone.classList.remove('drag-over');
+        });
+    })();
+</script>
+</body>
+</html>
